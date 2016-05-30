@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
+import org.apache.oltu.oauth2.common.OAuthProviderType;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.ResponseType;
 
@@ -44,6 +45,8 @@ public class LoginServlet extends HttpServlet {
                 loginGoogle(request, response);
             else if("3".equals(request.getParameter("t")))
                 loginFacebook(request, response);
+            else if("4".equals(request.getParameter("t")))
+                loginWSO2(request, response);
             else
                 throw new ServletException("Parâmetro 't' não existente ou com valor não suportado.");
         } catch (OAuthSystemException ex) {
@@ -54,29 +57,73 @@ public class LoginServlet extends HttpServlet {
     private void loginMicrosoft(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
         
-        String stateUuid = UUID.randomUUID().toString().replaceAll("-", "");
+        AuthenticationState state = new AuthenticationState("1");
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
-        
         OAuthClientRequest oauthReq = OAuthClientRequest
                 .authorizationLocation("https://login.microsoftonline.com/97ea4bf7-1360-4be4-9925-ae57d82346ef/oauth2/authorize")
                 .setScope("openid")
                 .setResponseType("code")
                 .setClientId("da6a990e-fc37-485d-989a-229a19f80c47")
                 .setRedirectURI("http://localhost:8080/webapp01/authorize")
-                .setState(stateUuid)
+                .setState(state.getSession())
                 .buildQueryMessage();
-        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, oauthReq.getLocationUri());
+        
+        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Redirect to MICROSOFT authorization URL:" + oauthReq.getLocationUri());
         response.sendRedirect(oauthReq.getLocationUri());
     }
     
     private void loginGoogle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
+            
+        AuthenticationState state = new AuthenticationState("2");
+        // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
+        OAuthClientRequest oauthReq = OAuthClientRequest
+                .authorizationProvider(OAuthProviderType.GOOGLE)
+                .setScope("openid")
+                .setResponseType("code")
+                .setClientId("321056030583-c26ieiq50cs96vvrlql52ptjc640qip9.apps.googleusercontent.com")
+                .setRedirectURI("http://localhost:8080/webapp01/authorize")
+                .setState(state.getSession())
+                .buildQueryMessage();
         
+        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Redirect to GOOGLE authorization URL:" + oauthReq.getLocationUri());
+        response.sendRedirect(oauthReq.getLocationUri());
     }
     
     private void loginFacebook(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
+    
+        AuthenticationState state = new AuthenticationState("3");
+        // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
+        OAuthClientRequest oauthReq = OAuthClientRequest
+                .authorizationProvider(OAuthProviderType.FACEBOOK)
+                .setScope("openid")
+                .setResponseType("code")
+                .setClientId("298440033821421")
+                .setRedirectURI("http://localhost:8080/webapp01/authorize")
+                .setState(state.getSession())
+                .buildQueryMessage();
         
+        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Redirect to FACEBOOK authorization URL:" + oauthReq.getLocationUri());
+        response.sendRedirect(oauthReq.getLocationUri());
+    }
+
+    private void loginWSO2(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, OAuthSystemException {
+    
+        AuthenticationState state = new AuthenticationState("4");
+        // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
+        OAuthClientRequest oauthReq = OAuthClientRequest
+                .authorizationLocation("https://10.199.101.201:9443/oauth2/authorize")
+                .setScope("openid")
+                .setResponseType("code")
+                .setClientId("4569zP7OWmasQzYlrEqmjHZ_aVca")
+                .setRedirectURI("http://localhost:8080/webapp01/authorize")
+                .setState(state.getSession())
+                .buildQueryMessage();
+        
+        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Redirect to WSO2 authorization URL:" + oauthReq.getLocationUri());
+        response.sendRedirect(oauthReq.getLocationUri());
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

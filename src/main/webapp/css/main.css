@@ -1,21 +1,11 @@
-html {
+
+
+.jumbotron {
+    background-color: #e4e4e4;
 }
 
-div {
-    min-height: 12px;
-}
-
-div.header {
-    background-color: cyan;
-}
-
-div.menu {
-    background-color: lightgreen;
-}
-
-div.footer {
-    background-color: orange;
-}
-
-@media print {
+@media (min-width: 768px) {
+    .sidebar {
+        background-color: #e5e5f5;
+    }
 }

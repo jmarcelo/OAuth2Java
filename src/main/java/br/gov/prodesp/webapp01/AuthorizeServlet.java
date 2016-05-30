@@ -7,6 +7,7 @@ package br.gov.prodesp.webapp01;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
@@ -50,6 +51,10 @@ public class AuthorizeServlet extends HttpServlet {
             OAuthAuthzResponse oar = OAuthAuthzResponse.oauthCodeAuthzResponse(request);
             String code = oar.getCode();
             
+            String referer = request.getHeader("referer");
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Request HTTP Referer:" + referer);
+            Enumeration headers = request.getHeaderNames();
+            
             // Busca o token
             OAuthClientRequest oauthReq = OAuthClientRequest
                 .tokenLocation("https://login.microsoftonline.com/97ea4bf7-1360-4be4-9925-ae57d82346ef/oauth2/token")
@@ -60,7 +65,7 @@ public class AuthorizeServlet extends HttpServlet {
                 .setGrantType(GrantType.AUTHORIZATION_CODE)
                 .buildBodyMessage();
             
-            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Token request URL:" + oauthReq.getLocationUri());
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Token request (POST) to URL:" + oauthReq.getLocationUri());
             
             OAuthClient client = new OAuthClient(new URLConnectionClient());
             OAuthJSONAccessTokenResponse resp = client.accessToken(oauthReq);
