@@ -1,0 +1,21 @@
+html {
+}
+
+div {
+    min-height: 12px;
+}
+
+div.header {
+    background-color: cyan;
+}
+
+div.menu {
+    background-color: lightgreen;
+}
+
+div.footer {
+    background-color: orange;
+}
+
+@media print {
+}

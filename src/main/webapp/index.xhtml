@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      class="no-js" >
+    <h:head></h:head>
+    <h:body>
+        <ui:composition template="/structure/template.xhtml">
+            <ui:define name="title">App Teste OAuth2</ui:define>
+            <ui:define name="content">
+                <div class="jumbotron">
+                    <h1>Teste OAuth2 / OpenID Connect</h1>
+                    <p>Esta aplicação foi desenvolvida para testar os mecanismos de 
+                       autenticação e autorização utilizando os protocolos abertos
+                       OAuth 2 e OpenID Connect 1.0.</p>
+                    <p>Para testar, efetue o login para utilizar os provedores de
+                       autenticação configurados.</p>                    
+                    <p><a class="btn btn-primary btn-lg" href="#{request.contextPath}/sobre.xhtml" role="button">Saiba mais</a></p>
+                </div>
+            </ui:define>
+        </ui:composition>
+    </h:body>
+</html>
