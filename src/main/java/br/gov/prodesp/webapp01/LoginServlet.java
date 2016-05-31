@@ -26,6 +26,8 @@ import org.apache.oltu.oauth2.common.message.types.ResponseType;
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
+    
+    private static final int DEFAULT_LOGIN_TIMEOUT = 10; // em minutos
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -39,13 +41,13 @@ public class LoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            if("1".equals(request.getParameter("t")))
+            if(LoginProvider.verifyRequestType(request, LoginProvider.MICROSOFT))
                 loginMicrosoft(request, response);
-            else if("2".equals(request.getParameter("t")))
+            else if(LoginProvider.verifyRequestType(request, LoginProvider.GOOGLE))
                 loginGoogle(request, response);
-            else if("3".equals(request.getParameter("t")))
+            else if(LoginProvider.verifyRequestType(request, LoginProvider.FACEBOOK))
                 loginFacebook(request, response);
-            else if("4".equals(request.getParameter("t")))
+            else if(LoginProvider.verifyRequestType(request, LoginProvider.WSO2))
                 loginWSO2(request, response);
             else
                 throw new ServletException("Parâmetro 't' não existente ou com valor não suportado.");
@@ -57,7 +59,9 @@ public class LoginServlet extends HttpServlet {
     private void loginMicrosoft(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
         
-        AuthenticationState state = new AuthenticationState("1");
+        AuthenticationState state = new AuthenticationState(LoginProvider.MICROSOFT);
+        Cache cache = Cache.getInstance();
+        cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
         OAuthClientRequest oauthReq = OAuthClientRequest
                 .authorizationLocation("https://login.microsoftonline.com/97ea4bf7-1360-4be4-9925-ae57d82346ef/oauth2/authorize")
@@ -75,7 +79,9 @@ public class LoginServlet extends HttpServlet {
     private void loginGoogle(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
             
-        AuthenticationState state = new AuthenticationState("2");
+        AuthenticationState state = new AuthenticationState(LoginProvider.GOOGLE);
+        Cache cache = Cache.getInstance();
+        cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
         OAuthClientRequest oauthReq = OAuthClientRequest
                 .authorizationProvider(OAuthProviderType.GOOGLE)
@@ -93,11 +99,14 @@ public class LoginServlet extends HttpServlet {
     private void loginFacebook(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
     
-        AuthenticationState state = new AuthenticationState("3");
+        AuthenticationState state = new AuthenticationState(LoginProvider.FACEBOOK);
+        Cache cache = Cache.getInstance();
+        cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
         OAuthClientRequest oauthReq = OAuthClientRequest
                 .authorizationProvider(OAuthProviderType.FACEBOOK)
-                .setScope("openid")
+                //.setScope("openid")  // Facebook não suporta OpenID Connect
+                .setScope("email")
                 .setResponseType("code")
                 .setClientId("298440033821421")
                 .setRedirectURI("http://localhost:8080/webapp01/authorize")
@@ -111,7 +120,9 @@ public class LoginServlet extends HttpServlet {
     private void loginWSO2(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
     
-        AuthenticationState state = new AuthenticationState("4");
+        AuthenticationState state = new AuthenticationState(LoginProvider.WSO2);
+        Cache cache = Cache.getInstance();
+        cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
         OAuthClientRequest oauthReq = OAuthClientRequest
                 .authorizationLocation("https://10.199.101.201:9443/oauth2/authorize")

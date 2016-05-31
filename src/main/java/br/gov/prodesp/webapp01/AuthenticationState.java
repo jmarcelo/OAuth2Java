@@ -13,19 +13,19 @@ import java.util.UUID;
  */
 public class AuthenticationState {
     private String session;
-    private String provider;
+    private int provider;
     
     public AuthenticationState() {
     }
     
-    public AuthenticationState(String provider) {
+    public AuthenticationState(int providerType) {
         this.session = UUID.randomUUID().toString().replaceAll("-", "");
-        this.provider = provider;
+        this.provider = providerType;
     }
     
-    public AuthenticationState(String session, String provider) {
+    public AuthenticationState(String session, int providerType) {
         this.session = session;
-        this.provider = provider;
+        this.provider = providerType;
     }
 
     public String getSession() {
@@ -36,12 +36,12 @@ public class AuthenticationState {
         this.session = session;
     }
 
-    public String getProvider() {
+    public int getProvider() {
         return provider;
     }
 
-    public void setProvider(String provider) {
-        this.provider = provider;
+    public void setProvider(int providerType) {
+        this.provider = providerType;
     }
        
 }
