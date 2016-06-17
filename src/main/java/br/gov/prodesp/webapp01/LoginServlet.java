@@ -49,6 +49,8 @@ public class LoginServlet extends HttpServlet {
                 loginFacebook(request, response);
             else if(LoginProvider.verifyRequestType(request, LoginProvider.WSO2))
                 loginWSO2(request, response);
+            else if(LoginProvider.verifyRequestType(request, LoginProvider.SP_GOV))
+                loginSpGov(request, response);
             else
                 throw new ServletException("Parâmetro 't' não existente ou com valor não suportado.");
         } catch (OAuthSystemException ex) {
@@ -128,7 +130,7 @@ public class LoginServlet extends HttpServlet {
                 .authorizationLocation("https://10.199.101.201:9443/oauth2/authorize")
                 .setScope("openid")
                 .setResponseType("code")
-                .setClientId("4569zP7OWmasQzYlrEqmjHZ_aVca")
+                .setClientId("tYmcIZHnRfuXCtvDB6rUcn9AfgMa")
                 .setRedirectURI("http://localhost:8080/webapp01/authorize")
                 .setState(state.getSession())
                 .buildQueryMessage();
@@ -137,6 +139,26 @@ public class LoginServlet extends HttpServlet {
         response.sendRedirect(oauthReq.getLocationUri());
     }
 
+    private void loginSpGov(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException, OAuthSystemException {
+    
+        AuthenticationState state = new AuthenticationState(LoginProvider.WSO2);
+        Cache cache = Cache.getInstance();
+        cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
+        // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
+        OAuthClientRequest oauthReq = OAuthClientRequest
+                .authorizationLocation("http://www.govspauth.com.br/connect/authorize")
+                .setScope("openid")
+                .setResponseType("id_token")
+                .setClientId("WebAppZe")
+                .setRedirectURI("http://localhost:8080/webapp01/authorize")
+                .setState(state.getSession())
+                .buildQueryMessage();
+        
+        Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Redirect to WSO2 authorization URL:" + oauthReq.getLocationUri());
+        response.sendRedirect(oauthReq.getLocationUri());
+    }
+        
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.

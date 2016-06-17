@@ -7,25 +7,21 @@ package br.gov.prodesp.webapp01;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.oltu.oauth2.client.OAuthClient;
 import org.apache.oltu.oauth2.client.URLConnectionClient;
 import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
-import org.apache.oltu.oauth2.client.response.GitHubTokenResponse;
 import org.apache.oltu.oauth2.client.response.OAuthAuthzResponse;
 import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
 import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
 import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
 import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.apache.oltu.oauth2.common.utils.JSONUtils;
 
 /**
  *
@@ -61,29 +57,39 @@ public class AuthorizeServlet extends HttpServlet {
             Cache cache = Cache.getInstance();
             AuthenticationState state = (AuthenticationState)cache.get(oar.getState());
             
-            if(state.getProvider() == LoginProvider.MICROSOFT) {
-                tokenEndpoint = "https://login.microsoftonline.com/97ea4bf7-1360-4be4-9925-ae57d82346ef/oauth2/token";
-                clientId = "da6a990e-fc37-485d-989a-229a19f80c47";
-                clientSecret = "";
-            } else if(state.getProvider() == LoginProvider.GOOGLE) {
-                tokenEndpoint = "https://www.googleapis.com/oauth2/v4/token";
-                clientId = "321056030583-c26ieiq50cs96vvrlql52ptjc640qip9.apps.googleusercontent.com";
-                clientSecret = "";
-            } else if(state.getProvider() == LoginProvider.FACEBOOK) {
-                tokenEndpoint = "https://graph.facebook.com/v2.3/oauth/access_token";
-                clientId = "298440033821421";
-                clientSecret = "";
-            } else if(state.getProvider() == LoginProvider.WSO2) {
-                tokenEndpoint = "https://10.199.101.201:9443/oauth2/token";
-                clientId = "4569zP7OWmasQzYlrEqmjHZ_aVca";
-                clientSecret = "aBQLfBOQfSOTjG94MJgf91nzV0sa";
-            } else {
-                throw new Exception("O login provider não pode ser verificado através do parâmetro 'state'.");
+            switch (state.getProvider()) {
+                case LoginProvider.MICROSOFT:
+                    tokenEndpoint = "https://login.microsoftonline.com/97ea4bf7-1360-4be4-9925-ae57d82346ef/oauth2/token";
+                    clientId = "da6a990e-fc37-485d-989a-229a19f80c47";
+                    clientSecret = "Gk38t6ESu9WZx2rKCRcCNC/JI4HpTfBXOJmzocWWsYc=";
+                    break;
+                case LoginProvider.GOOGLE:
+                    tokenEndpoint = "https://www.googleapis.com/oauth2/v4/token";
+                    clientId = "321056030583-c26ieiq50cs96vvrlql52ptjc640qip9.apps.googleusercontent.com";
+                    clientSecret = "Y68-nxHVRycwAnj_9uaxjHU9";
+                    break;
+                case LoginProvider.FACEBOOK:
+                    tokenEndpoint = "https://graph.facebook.com/v2.3/oauth/access_token";
+                    clientId = "298440033821421";
+                    clientSecret = "b5834ca79be89d1c8c73becd21cf65cf";
+                    break;
+                case LoginProvider.WSO2:
+                    tokenEndpoint = "https://10.199.101.201:9443/oauth2/token";
+                    clientId = "tYmcIZHnRfuXCtvDB6rUcn9AfgMa";
+                    clientSecret = "WEcs7fpLCFLk_NybkX2YjbGRZxga";
+                    break;
+                case LoginProvider.SP_GOV:
+                    tokenEndpoint = "http://www.govspauth.com.br/connect/token";
+                    clientId = "WebAppZe";
+                    clientSecret = "secret";
+                    break;
+                default:
+                    throw new Exception("O login provider não pode ser verificado através do parâmetro 'state'.");
             }
             
             String referer = request.getHeader("referer");
-            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Request HTTP Referer:" + referer);
-            Enumeration headers = request.getHeaderNames();
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Request HTTP Referer: {0}", referer);
+            //Enumeration headers = request.getHeaderNames();
             
             // Busca o token
             OAuthClientRequest oauthReq = OAuthClientRequest
@@ -95,7 +101,7 @@ public class AuthorizeServlet extends HttpServlet {
                 .setGrantType(GrantType.AUTHORIZATION_CODE)
                 .buildBodyMessage();
             
-            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Token request (POST) to URL:" + oauthReq.getLocationUri());
+            Logger.getLogger(LoginServlet.class.getName()).log(Level.INFO, "Token request (POST) to URL: {0}", oauthReq.getLocationUri());
             
             OAuthClient client = new OAuthClient(new URLConnectionClient());
             OAuthJSONAccessTokenResponse resp = client.accessToken(oauthReq);

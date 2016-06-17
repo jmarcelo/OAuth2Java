@@ -16,6 +16,7 @@ public class LoginProvider {
     public static final int GOOGLE = 2;
     public static final int FACEBOOK = 3;
     public static final int WSO2 = 4;
+    public static final int SP_GOV = 5;
     
     public static boolean verifyRequestType(HttpServletRequest request, int type) {
         String par = request.getParameter("t");
