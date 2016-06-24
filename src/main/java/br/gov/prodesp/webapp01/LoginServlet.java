@@ -142,7 +142,7 @@ public class LoginServlet extends HttpServlet {
     private void loginSpGov(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException, OAuthSystemException {
     
-        AuthenticationState state = new AuthenticationState(LoginProvider.WSO2);
+        AuthenticationState state = new AuthenticationState(LoginProvider.SP_GOV);
         Cache cache = Cache.getInstance();
         cache.put(state.getSession(), state, DEFAULT_LOGIN_TIMEOUT);
         // TODO: implementar cache distribuído com TTL do state e checar no servlet de autorização.
